@@ -15,7 +15,7 @@ const userSchema = new Schema(
     cellphone: Number,
     salt: String,
     pass: String,
-    type: String,
+    rol: String,
     department: [ String ],
     tower: [ String ],
     date: { date: String, time: String },

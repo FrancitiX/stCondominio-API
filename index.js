@@ -90,6 +90,4 @@ app.post("/get-All-Penaltys", penaltyController.get_All_Penalty);
 // Dependencias
 
 // npm install
-// npm i express body-parser mongoose multer cors jsonwebtoken bcrypt
-// npm install dotenv
-
+// npm i express body-parser mongoose multer cors jsonwebtoken bcrypt dotenv mongodb

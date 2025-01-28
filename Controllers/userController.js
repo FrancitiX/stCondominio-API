@@ -24,6 +24,17 @@ const Salt = (username) => {
   return `${firstLetter}${lastLetter}${randomPart}`;
 };
 
+const username = (name, number) => {
+  if (!name || name.length < 2) {
+    throw new Error("El nombre de usuario debe tener al menos 2 caracteres.");
+  }
+
+  const firstLetter = username[0].toLowerCase();
+  const lastLetter = username[username.length - 1].toLowerCase();
+
+  return `${firstLetter}${number}${lastLetter}`;
+};
+
 const registerUser = async (req, res) => {
   const {
     name,
@@ -34,7 +45,7 @@ const registerUser = async (req, res) => {
     cellphone,
     password,
     email,
-    type,
+    rol,
   } = req.body;
   console.log(req.body);
 
@@ -43,6 +54,7 @@ const registerUser = async (req, res) => {
     const pepper = process.env.PEPPER;
     const enPassword = await bcrypt.hash(pepper + password + salt, 12);
     const oldEmail = await User.findOne({ email: email });
+    const user = username(name, cellphone);
 
     if (oldEmail) {
       res.status(400).json({
@@ -50,24 +62,24 @@ const registerUser = async (req, res) => {
         data: "El correo ya está registrado!",
       });
     } else {
-      await User.create({
-        name: { name, paternal_surname, maternal_surname },
-        username: username,
-        email,
-        cellphone: { country, cellphone },
-        salt: salt,
-        pass: enPassword,
-        type,
-      });
-
-      await userImage.create({
-        username: username,
-        image: "",
-        bgimage: "",
-      });
-
-      res.status(201).json({ status: "ok", data: "Usuario creado" });
-      console.log("Usuario creado exitosamente");
+      console.log(user);
+      
+      // await User.create({
+      //   name: { name, paternal_surname, maternal_surname },
+      //   username: user,
+      //   email,
+      //   cellphone: { country, cellphone },
+      //   salt: salt,
+      //   pass: enPassword,
+      //   type,
+      // });
+      // await userImage.create({
+      //   username: user,
+      //   image: "",
+      //   bgimage: "",
+      // });
+      // res.status(201).json({ status: "ok", data: "Usuario creado" });
+      // console.log("Usuario creado exitosamente");
     }
   } catch (error) {
     console.error("error: " + error);
