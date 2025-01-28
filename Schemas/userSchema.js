@@ -1,5 +1,5 @@
-import { Schema as _Schema, model } from "mongoose";
-const Schema = _Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
   {
@@ -34,4 +34,4 @@ userSchema.pre("save", function (next) {
   next();
 });
 
-model("users", userSchema);
+mongoose.model("users", userSchema);

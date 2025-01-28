@@ -1,5 +1,5 @@
-import { Schema as _Schema, model } from "mongoose";
-const Schema = _Schema;
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema(
   {
@@ -34,4 +34,4 @@ notificationSchema.pre("save", function (next) {
   next();
 });
 
-export default model("penalty", notificationSchema);
+mongoose.model("penalty", notificationSchema);

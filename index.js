@@ -56,8 +56,6 @@ const penaltyController = require("./Controllers/PenaltyController")
 
 app.post("/register", userController.registerUser);
 
-app.post("/user-aval", userController.user_aval);
-
 app.post("/login", userController.loginUser);
 
 app.post("/userData", userController.userData);

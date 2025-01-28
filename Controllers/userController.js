@@ -29,7 +29,7 @@ const registerUser = async (req, res) => {
     name,
     paternal_surname,
     maternal_surname,
-    user_name,
+    username,
     country,
     cellphone,
     password,
@@ -52,7 +52,7 @@ const registerUser = async (req, res) => {
     } else {
       await User.create({
         name: { name, paternal_surname, maternal_surname },
-        user_name,
+        username: username,
         email,
         cellphone: { country, cellphone },
         salt: salt,
@@ -61,7 +61,7 @@ const registerUser = async (req, res) => {
       });
 
       await userImage.create({
-        user_name: user_name,
+        username: username,
         image: "",
         bgimage: "",
       });
@@ -77,33 +77,13 @@ const registerUser = async (req, res) => {
   }
 };
 
-const user_aval = async (req, res) => {
-  const { user_name } = req.body;
-  try {
-    const newName = await User.findOne({ user_name: user_name });
-    if (newName) {
-      res.send({
-        status: "Ocupado",
-        data: "Usuario Ocupado!",
-      });
-    } else {
-      res.send({
-        status: "Dispnible",
-        data: "Usuario Disponible!",
-      });
-    }
-  } catch (e) {
-    console.error("Error al validar usuario: " + e);
-  }
-};
-
 const loginUser = async (req, res) => {
   const { user, password } = req.body;
   console.log(user, password);
   console.log("");
   try {
     const userToCheck = await User.findOne({
-      $or: [{ email: user }, { user_name: user }],
+      $or: [{ email: user }, { username: user }],
     });
 
     if (!userToCheck) {
@@ -125,14 +105,14 @@ const loginUser = async (req, res) => {
     }
 
     // Generar token JWT
-    const payload = { id: userToCheck._id, user_name: userToCheck.user_name };
+    const payload = { id: userToCheck._id, username: userToCheck.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
     return res.status(200).json({
       status: "ok",
-      usuario: userToCheck.user_name,
+      usuario: userToCheck.username,
       token: token,
     });
   } catch (error) {
@@ -154,9 +134,9 @@ const userData = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { user_name } = decoded;
+    const { username } = decoded;
 
-    User.findOne({ user_name: user_name })
+    User.findOne({ username: username })
       .then((user) => {
         return res.status(200).json({ status: "ok", data: user });
       })
@@ -172,11 +152,11 @@ const userData = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { image, user_name, email, password, newPassword } = req.body;
+  const { image, username, email, password, newPassword } = req.body;
   try {
     if (!password) {
       await BC_U.updateOne(
-        { user_name: user_name },
+        { username: username },
         {
           $set: {
             email,
@@ -184,7 +164,7 @@ const updateUser = async (req, res) => {
         }
       );
       await User.updateOne(
-        { user_name: user_name },
+        { username: username },
         {
           $set: {
             email,
@@ -194,10 +174,10 @@ const updateUser = async (req, res) => {
     } else {
       const enPassword = await bcrypt.hash(newPassword, 12);
 
-      const User_Name = await User.findOne({ user_name: user_name });
-      if (await bcrypt.compare(password, User_Name.pass)) {
+      const username = await User.findOne({ username: username });
+      if (await bcrypt.compare(password, username.pass)) {
         await BC_U.updateOne(
-          { user_name: user_name },
+          { username: username },
           {
             $set: {
               email,
@@ -206,7 +186,7 @@ const updateUser = async (req, res) => {
           }
         );
         await User.updateOne(
-          { user_name: user_name },
+          { username: username },
           {
             $set: {
               email,
@@ -244,10 +224,10 @@ const getAllUsers = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const { user_name } = req.body;
+  const { username } = req.body;
   try {
-    await userImage.deleteOne({ user_name: user_name });
-    await User.deleteOne({ user_name: user_name });
+    await userImage.deleteOne({ username: username });
+    await User.deleteOne({ username: username });
 
     res.send({ status: "ok", data: "User Deleted" });
   } catch (error) {
@@ -258,7 +238,6 @@ const deleteUser = async (req, res) => {
 
 module.exports = {
   registerUser,
-  user_aval,
   loginUser,
   userData,
   updateUser,
