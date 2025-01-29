@@ -14,7 +14,7 @@ const userSchema = new Schema(
     email: { type: String, unique: true },
     cellphone: Number,
     salt: String,
-    pass: String,
+    password: String,
     rol: String,
     department: [ String ],
     tower: [ String ],

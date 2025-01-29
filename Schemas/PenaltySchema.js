@@ -14,9 +14,7 @@ const penaltySchema = new Schema(
   },
   {
     timestamps: true,
-  },
-  {
-    collection: "penaltys",
+    collection: "penalties",
   }
 );
 
@@ -29,4 +27,4 @@ penaltySchema.pre("save", function (next) {
   next();
 });
 
-mongoose.model("penalty", penaltySchema);
+mongoose.model("penalties", penaltySchema);

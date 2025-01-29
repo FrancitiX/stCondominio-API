@@ -34,4 +34,4 @@ notificationSchema.pre("save", function (next) {
   next();
 });
 
-mongoose.model("penalty", notificationSchema);
+mongoose.model("notifications", notificationSchema);

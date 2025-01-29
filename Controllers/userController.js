@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const app = express();
 app.use(express.json());
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 require("dotenv").config();
 
 require("./../Schemas/userSchema");
@@ -24,37 +25,26 @@ const Salt = (username) => {
   return `${firstLetter}${lastLetter}${randomPart}`;
 };
 
-const username = (name, number) => {
+const usernameCreate = (name, number) => {
   if (!name || name.length < 2) {
     throw new Error("El nombre de usuario debe tener al menos 2 caracteres.");
   }
 
-  const firstLetter = username[0].toLowerCase();
-  const lastLetter = username[username.length - 1].toLowerCase();
+  const firstLetter = name[0].toUpperCase() + name[1].toUpperCase();
+  const lastLetter = name[name.length - 1].toUpperCase();
 
   return `${firstLetter}${number}${lastLetter}`;
 };
 
 const registerUser = async (req, res) => {
-  const {
-    name,
-    paternal_surname,
-    maternal_surname,
-    username,
-    country,
-    cellphone,
-    password,
-    email,
-    rol,
-  } = req.body;
-  console.log(req.body);
+  const { name, cellphone, pass, email, rol, department, tower } = req.body;
 
   try {
-    const salt = Salt(name);
+    const salt = Salt(name.name);
     const pepper = process.env.PEPPER;
-    const enPassword = await bcrypt.hash(pepper + password + salt, 12);
+    const enPassword = await bcrypt.hash(pepper + pass + salt, 12);
     const oldEmail = await User.findOne({ email: email });
-    const user = username(name, cellphone);
+    const user = usernameCreate(name.name, cellphone);
 
     if (oldEmail) {
       res.status(400).json({
@@ -63,23 +53,29 @@ const registerUser = async (req, res) => {
       });
     } else {
       console.log(user);
-      
-      // await User.create({
-      //   name: { name, paternal_surname, maternal_surname },
-      //   username: user,
-      //   email,
-      //   cellphone: { country, cellphone },
-      //   salt: salt,
-      //   pass: enPassword,
-      //   type,
-      // });
-      // await userImage.create({
-      //   username: user,
-      //   image: "",
-      //   bgimage: "",
-      // });
-      // res.status(201).json({ status: "ok", data: "Usuario creado" });
-      // console.log("Usuario creado exitosamente");
+
+      await User.create({
+        name: {
+          name: name.name,
+          paternal_surname: name.paternal_surname,
+          maternal_surname: name.maternal_surname,
+        },
+        username: user,
+        email,
+        cellphone: cellphone,
+        salt: salt,
+        password: enPassword,
+        rol,
+        department,
+        tower,
+      });
+      await userImage.create({
+        username: user,
+        image: "",
+        bgimage: "",
+      });
+      res.status(201).json({ status: "ok", data: "Usuario creado" });
+      console.log("Usuario creado exitosamente");
     }
   } catch (error) {
     console.error("error: " + error);
@@ -90,25 +86,22 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { user, password } = req.body;
-  console.log(user, password);
-  console.log("");
+  const { number, password } = req.body;
+  console.log(number, password);
   try {
-    const userToCheck = await User.findOne({
-      $or: [{ email: user }, { username: user }],
+    const user = await User.findOne({
+      $or: [{ cellphone: number }],
     });
 
-    if (!userToCheck) {
+    if (!user) {
       return res
         .status(404)
         .json({ status: "error", data: "Usuario no registrado" });
     }
-    const { salt } = userToCheck;
+    const { salt } = user;
     const pepper = process.env.PEPPER;
-    const isPasswordValid = await bcrypt.compare(
-      pepper + password + salt,
-      userToCheck.pass
-    );
+    const passwordComplete = pepper + password + salt;
+    const isPasswordValid = await bcrypt.compare(passwordComplete, user.password);
 
     if (!isPasswordValid) {
       return res
@@ -117,14 +110,14 @@ const loginUser = async (req, res) => {
     }
 
     // Generar token JWT
-    const payload = { id: userToCheck._id, username: userToCheck.username };
+    const payload = { cellphone: user.cellphone, username: user.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
     return res.status(200).json({
       status: "ok",
-      usuario: userToCheck.username,
+      rol: user.rol,
       token: token,
     });
   } catch (error) {

@@ -24,7 +24,8 @@ const app = express();
 // };
 // app.use(cors(corsOptions));
 // app.options("*", cors(corsOptions));
-app.use(cors);
+app.use(cors());
+
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -81,9 +82,11 @@ app.post("/userImage", user_imageController.userImage);
 
 app.post("/newPenalty", penaltyController.newPenalty);
 
-app.post("/getPenaltys", penaltyController.getPenalty);
+app.post("/getPenalties", penaltyController.getPenalty);
 
-app.post("/get-All-Penaltys", penaltyController.get_All_Penalty);
+app.post("/get-All-Penalties", penaltyController.get_All_Penalty);
+
+//Solicitudes de notificaciones 
 
 
 

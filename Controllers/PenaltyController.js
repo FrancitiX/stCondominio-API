@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 
 require("../Schemas/PenaltySchema").default;
-const Penalty = mongoose.model("penalty");
+const Penalty = mongoose.model("penalties");
 
 // Insertar multas
 const newPenalty = async (req, res) => {
