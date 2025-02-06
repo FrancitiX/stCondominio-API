@@ -3,13 +3,14 @@ const mongoose = require("mongoose");
 const app = express();
 app.use(express.json());
 
-require("../Schemas/PenaltySchema").default;
+require("../Schemas/PenaltySchema");
 const Penalty = mongoose.model("penalties");
+const { newNotification } = require("./NotificationController");
 
 // Insertar multas
 const newPenalty = async (req, res) => {
   try {
-    const { user, name, department, tower, penalty } = req.body;
+    const { user, name, department, tower, penalty, description, motivo } = req.body;
 
     if (!user || !name || !department || !tower || !penalty) {
       return res
@@ -23,6 +24,25 @@ const newPenalty = async (req, res) => {
       tower,
       penalty,
     });
+
+    const notificationData = {
+      department: department,
+      tower,
+      title: "Usted a sido multado",
+      short: `Se ha registrado una multa para usted por ${motivo}`,
+      description: description,
+      type: "MULTA",
+      recipients: [{ user: user, read: false }],
+    };
+
+    try {
+      await newNotification(
+        { body: notificationData },
+        { status: () => ({ json: () => {} }) }
+      );
+    } catch (error) {
+      console.error("Error al crear la notificación:", error);
+    }
 
     res.status(201).json({ status: "ok", data: multa });
   } catch (error) {

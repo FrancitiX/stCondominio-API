@@ -38,7 +38,8 @@ const usernameCreate = (name, number) => {
 
 const registerUser = async (req, res) => {
   const { name, cellphone, pass, email, rol, department, tower } = req.body;
-
+  console.log(req.body);
+  
   try {
     const salt = Salt(name.name);
     const pepper = process.env.PEPPER;
@@ -51,6 +52,7 @@ const registerUser = async (req, res) => {
         status: "correo",
         data: "El correo ya está registrado!",
       });
+      console.log("El correo ya está registrado!");
     } else {
       console.log(user);
 

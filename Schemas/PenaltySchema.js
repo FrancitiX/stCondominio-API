@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const penaltySchema = new Schema(
   {
-    user: { type: String, required: true },
+    user: [{ type: String, required: true }],
     title: String,
     id: { type: String, unique: true },
     department: { type: String, required: true },
