@@ -59,7 +59,7 @@ app.post("/register", userController.registerUser);
 
 app.post("/login", userController.loginUser);
 
-app.post("/userData", userController.userData);
+app.get("/userData", userController.userData);
 
 app.put("/updateUser", userController.updateUser);
 

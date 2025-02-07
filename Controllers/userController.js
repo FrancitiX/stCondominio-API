@@ -38,7 +38,7 @@ const usernameCreate = (name, number) => {
 
 const registerUser = async (req, res) => {
   const { name, cellphone, pass, email, rol, department, tower } = req.body;
-  console.log(req.body);
+  console.log("Registro: ", name.name);
   
   try {
     const salt = Salt(name.name);
@@ -89,7 +89,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { number, password } = req.body;
-  console.log(number, password);
+  console.log("Login: ", number);
   try {
     const user = await User.findOne({
       $or: [{ cellphone: number }],
@@ -136,8 +136,6 @@ const userData = async (req, res) => {
   if (!token) {
     return res.status(401).json({ error: "Error al iniciar sesion" });
   }
-  console.log(token);
-  console.log("");
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
