@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const gateSchema = new Schema(
+const roleSchema = new Schema(
   {
     number: Number,
-    name: String,
+    role: String,
     date: { date: String, time: String },
   },
   {
     timestamps: true,
-    collection: "gates",
+    collection: "role",
   }
 );
 
-gateSchema.pre("save", function (next) {
+roleSchema.pre("save", function (next) {
   const dateMexico = new Date().toLocaleString("es-MX", {
     timeZone: "America/Mexico_City",
   });
@@ -22,4 +22,4 @@ gateSchema.pre("save", function (next) {
   next();
 });
 
-mongoose.model("gate", gateSchema);
+mongoose.model("role", roleSchema);

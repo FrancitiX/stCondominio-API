@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 const app = express();
 app.use(express.json());
 
@@ -10,17 +11,17 @@ const idNotification = (title, type) => {
   if (!type) {
     throw new Error("La notificación debe tener un tipo.");
   }
-  const now = new Date();
+  const random = crypto.randomBytes(10).toString("hex");
 
   if (title > 2) {
     const firstLetter =
       title[0].toUpperCase() + title[1].toUpperCase() + type[0].toUpperCase();
 
-    return `${firstLetter}-${type}${now}`;
+    return `${firstLetter}-${type}${random}`;
   } else {
     const firstLetter = type[0].toUpperCase();
 
-    return `${firstLetter}-${type}${now}`;
+    return `${firstLetter}-${type}${random}`;
   }
 };
 
@@ -36,6 +37,8 @@ const newNotification = async (req, res) => {
       type,
       recipients,
     } = req.body;
+    console.log("Se añadio una Notificacion ", req.body);
+
 
     if (!title || !short || !type || !recipients) {
       return res

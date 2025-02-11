@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 const app = express();
 app.use(express.json());
 
@@ -7,19 +8,46 @@ require("../Schemas/PenaltySchema");
 const Penalty = mongoose.model("penalties");
 const { newNotification } = require("./NotificationController");
 
+const idPenalty = (title) => {
+  if (!title) {
+    throw new Error("La notificación debe tener un titulo.");
+  }
+  const random = crypto.randomBytes(10).toString("hex");
+
+  if (title > 2) {
+    const firstLetter =
+      title[0].toUpperCase() + title[1].toUpperCase();
+
+      const lastLetter =
+      title[title.length - 1].toUpperCase();
+
+    return `${firstLetter}-${random}${lastLetter}`;
+  } else {
+    const firstLetter = title[0].toUpperCase() + title[1].toUpperCase();
+
+    return `${firstLetter}-${random}`;
+  }
+};
+
 // Insertar multas
 const newPenalty = async (req, res) => {
   try {
-    const { user, name, department, tower, penalty, description, motivo } = req.body;
+    const { user, title, department, tower, penalty, description, motivo } = req.body;
+    console.log("Se añadio una Multa ");
 
-    if (!user || !name || !department || !tower || !penalty) {
+
+    if (!user || !title || !department || !tower || !penalty) {
       return res
         .status(400)
         .json({ message: "Todos los campos son obligatorios" });
     }
+
+    const id = idPenalty(title, motivo)
+
     const multa = await Penalty.create({
+      id,
       user,
-      name,
+      title,
       department,
       tower,
       penalty,
@@ -32,7 +60,7 @@ const newPenalty = async (req, res) => {
       short: `Se ha registrado una multa para usted por ${motivo}`,
       description: description,
       type: "MULTA",
-      recipients: [{ user: user, read: false }],
+      recipients: [{ user: Array.isArray(user) ? user.join(", ") : user, read: false }],
     };
 
     try {
