@@ -139,10 +139,10 @@ const getNotifications = async (req, res) => {
 
 const getPushNotifications = async (req, res) => {
   const { user } = req.body;
-
+  
   try {
     const notifications = await Notification.find({ "recipients.user": user });
-
+    
     res.status(200).send({ status: "ok", data: notifications });
   } catch (error) {
     console.error("Error al obtener las multas:", error);

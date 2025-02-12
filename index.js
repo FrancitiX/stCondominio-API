@@ -52,6 +52,7 @@ app.get("/", (req, res) => {
 const userController = require("./Controllers/userController");
 const user_imageController = require("./Controllers/user_imageController");
 const penaltyController = require("./Controllers/PenaltyController")
+const notificationController = require("./Controllers/NotificationController")
 
 //Solicitudes a la base de datos para usuarios
 
@@ -82,11 +83,23 @@ app.post("/userImage", user_imageController.userImage);
 
 app.post("/newPenalty", penaltyController.newPenalty);
 
-app.post("/getPenalties", penaltyController.getPenalty);
+app.get("/getPenalties", penaltyController.getPenalty);
 
-app.post("/get-All-Penalties", penaltyController.get_All_Penalty);
+app.get("/get-All-Penalties", penaltyController.get_All_Penalty);
 
 //Solicitudes de notificaciones 
+
+app.post("/newNotification", notificationController.newNotification);
+
+app.get("/get-All-Notifications", notificationController.getNotifications);
+
+app.post("/notifications", notificationController.getPushNotifications);
+
+app.get("/getNotification", notificationController.getNotification);
+
+app.put("/getNotification", notificationController.updateNotification);
+
+app.delete("/getNotification", notificationController.deleteNotification);
 
 
 
