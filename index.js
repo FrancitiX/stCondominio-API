@@ -7,7 +7,6 @@ const MONGO_URL = process.env.DB_URI;
 const PORT = process.env.PORT;
 // const allowedOrigins = process.env.ORIGINS.split(",");
 
-
 const app = express();
 
 // const corsOptions = {
@@ -25,7 +24,6 @@ const app = express();
 // app.use(cors(corsOptions));
 // app.options("*", cors(corsOptions));
 app.use(cors());
-
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,8 +49,8 @@ app.get("/", (req, res) => {
 //Controladores de solicitudes
 const userController = require("./Controllers/userController");
 const user_imageController = require("./Controllers/user_imageController");
-const penaltyController = require("./Controllers/PenaltyController")
-const notificationController = require("./Controllers/NotificationController")
+const penaltyController = require("./Controllers/PenaltyController");
+const notificationController = require("./Controllers/NotificationController");
 
 //Solicitudes a la base de datos para usuarios
 
@@ -78,7 +76,6 @@ app.put(
 
 app.post("/userImage", user_imageController.userImage);
 
-
 //Solicitudes de Multas
 
 app.post("/newPenalty", penaltyController.newPenalty);
@@ -87,7 +84,7 @@ app.get("/getPenalties", penaltyController.getPenalty);
 
 app.get("/get-All-Penalties", penaltyController.get_All_Penalty);
 
-//Solicitudes de notificaciones 
+//Solicitudes de notificaciones
 
 app.post("/newNotification", notificationController.newNotification);
 
@@ -100,7 +97,6 @@ app.get("/getNotification", notificationController.getNotification);
 app.put("/getNotification", notificationController.updateNotification);
 
 app.delete("/getNotification", notificationController.deleteNotification);
-
 
 
 // Dependencias

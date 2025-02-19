@@ -7,106 +7,78 @@ app.use(express.json());
 require("../Schemas/TokenSchema");
 const Token = mongoose.model("token");
 
-const addSession = (user) => {
-  if (!user || user.length < 2) {
-    throw new Error("Ocurrio un error con el usuario");
-  }
-
-  const firstLetter = name[0].toUpperCase() + name[1].toUpperCase();
-  const lastLetter = name[name.length - 1].toUpperCase();
-
-  const randomPart = crypto.randomBytes(5).toString("hex");
-
-  return `${firstLetter}${lastLetter}${randomPart}`;
-};
-
 // Insertar multas
-const newSession = async (req, res) => {
+const newSession = async (user, token, session) => {
   try {
-    const { user, token, sessions } = req.body;
-
     if (!user || !token) {
-      return res
-        .status(400)
-        .json({ message: "Ocurrio un error al registrar la sesion" });
+      console.log("Ocurrio un error al registrar la sesion");
+      return false;
     }
 
-    const multa = await Token.create({
+    const newToken = await Token.create({
       user,
       token,
       session,
-      status: true,
     });
 
-    res.status(201).json({ status: "ok", data: multa });
+    return newToken;
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al registrar la multa" });
+    return false;
   }
 };
 
-const getSession = async (req, res) => {
+const getSession = async (token, session) => {
   try {
-    const { user, token, session } = req.body;
-
-    if (!user || !token) {
-      return res
-        .status(400)
-        .json({ message: "Ocurrio un error al registrar la sesion" });
+    if (!session || !token) {
+      console.log("Ocurrio un error al registrar la sesion");
+      return false;
     }
 
-    const multa = await Token.create({
-      user,
-      token,
-      session,
-      status: true,
+    const Session = await Token.findOne({
+      token: token,
+      session: session,
     });
 
-    res.status(201).json({ status: "ok", data: multa });
+    return Session;
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al registrar la multa" });
+    return false;
   }
 };
 
-const closeSession = async (req, res) => {
-  const { user, session_id } = req.body;
-
+const closeSession = async (user, session) => {
   try {
-    const session = await Token.find({ user: user });
+    const session = await Token.findOne({ user, session });
 
     if (session) {
-      const close = await Token.deleteOne({ session: session_id });
-
-      res.status(202).send({ status: "ok", data: close });
+      await Token.deleteOne({ session });
+      return true;
     }
 
-    res.status(404).send({ status: "error", data: "No se encontro la sesión" });
+    console.log("No se encontro la sesión");
+
+    return false;
   } catch (error) {
-    console.error("Error al obtener la multa: ", error);
-    res.status(500).json({ error: "Error al obtener la multa" });
+    console.error("Error al cerrar sesión: ", error);
+    return false;
   }
 };
 
-const close_All_Sessions = async (req, res) => {
-  let skip = parseInt(req.query.skip) || 0;
-
+const close_All_Sessions = async (user) => {
   try {
-    const Tokens = await Token.find({})
-      .skip(parseInt(skip))
-      .limit(parseInt(10));
+    if (user) {
+      const close = await Token.deleteMany({ user: user });
 
-    const totalDocs = await Token.countDocuments();
-    const pages = {
-      docs: data.length,
-      totalDocs: totalDocs,
-      totalPages: Math.ceil(totalDocs / 10),
-    };
+      return close;
+    }
 
-    res.status(200).send({ status: "ok", data: Tokens, pages: pages });
+    console.log("No se encontro la sesión");
+
+    return false;
   } catch (error) {
-    console.error("Error al obtener las multas:", error);
-    res.status(500).json({ error: "Error al obtener las multas" });
+    console.error("Error al cerrar sesión: ", error);
+    return false;
   }
 };
 

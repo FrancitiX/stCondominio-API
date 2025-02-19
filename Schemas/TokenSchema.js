@@ -6,7 +6,6 @@ const tokenSchema = new Schema(
     user: String,
     token: String,
     session: Number,
-    status: Boolean,
     date: { date: String, time: String },
   },
   {

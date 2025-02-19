@@ -12,6 +12,13 @@ require("../Schemas/user_imageSchema");
 const User = mongoose.model("users");
 const userImage = mongoose.model("user_image");
 
+const {
+  newSession,
+  getSession,
+  closeSession,
+  close_All_Sessions,
+} = require("./TokenController");
+
 const Salt = (username) => {
   if (!username || username.length < 2) {
     throw new Error("El nombre de usuario debe tener al menos 2 caracteres.");
@@ -39,7 +46,7 @@ const usernameCreate = (name, number) => {
 const registerUser = async (req, res) => {
   const { name, cellphone, pass, email, rol, department, tower } = req.body;
   console.log("Registro: ", name.name);
-  
+
   try {
     const salt = Salt(name.name);
     const pepper = process.env.PEPPER;
@@ -88,11 +95,11 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { number, password } = req.body;
+  const { number, password, remember, session } = req.body;
   console.log("Login: ", number);
   try {
     const user = await User.findOne({
-      $or: [{ cellphone: number }],
+      cellphone: number,
     });
 
     if (!user) {
@@ -103,7 +110,10 @@ const loginUser = async (req, res) => {
     const { salt } = user;
     const pepper = process.env.PEPPER;
     const passwordComplete = pepper + password + salt;
-    const isPasswordValid = await bcrypt.compare(passwordComplete, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      passwordComplete,
+      user.password
+    );
 
     if (!isPasswordValid) {
       return res
@@ -113,9 +123,14 @@ const loginUser = async (req, res) => {
 
     // Generar token JWT
     const payload = { cellphone: user.cellphone, username: user.username };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    if (!remember) {
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+    } else {
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {});
+      newSession(user.username, token, session);
+    }
 
     return res.status(200).json({
       status: "ok",
