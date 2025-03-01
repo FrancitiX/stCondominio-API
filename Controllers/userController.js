@@ -95,7 +95,10 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { number, password, remember, session } = req.body;
+  const { number, password, remember } = req.body;
+  const ip = req.connection.remoteAddress;
+  console.log("IP del cliente:", ip);
+  console.log(remember);
   console.log("Login: ", number);
   try {
     const user = await User.findOne({
@@ -123,14 +126,17 @@ const loginUser = async (req, res) => {
 
     // Generar token JWT
     const payload = { cellphone: user.cellphone, username: user.username };
-    if (!remember) {
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "24h",
-      });
-    } else {
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {});
-      newSession(user.username, token, session);
-    }
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    // if (!remember) {
+    //   const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    //     expiresIn: "1h",
+    //   });
+    // } else {
+    //   const token = jwt.sign(payload, process.env.JWT_SECRET, {});
+    //   newSession(user.username, token, session);
+    // }
 
     return res.status(200).json({
       status: "ok",
