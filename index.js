@@ -51,6 +51,7 @@ const userController = require("./Controllers/userController");
 const user_imageController = require("./Controllers/user_imageController");
 const penaltyController = require("./Controllers/PenaltyController");
 const notificationController = require("./Controllers/NotificationController");
+const messagesController = require("./Controllers/MessagesController");
 
 //Solicitudes a la base de datos para usuarios
 
@@ -97,6 +98,11 @@ app.get("/getNotification", notificationController.getNotification);
 app.put("/getNotification", notificationController.updateNotification);
 
 app.delete("/getNotification", notificationController.deleteNotification);
+
+//Mensajes de whatsapp y email
+
+app.post("/restore-password", messagesController.RestorePasswordMessage);
+
 
 
 // Dependencias
