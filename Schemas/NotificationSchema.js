@@ -5,7 +5,7 @@ const notificationSchema = new Schema(
   {
     id: { type: String, unique: true},
     department: [{ type: String, required: true }],
-    tower: { type: String, required: true },
+    tower: [{ type: String, required: true }],
     title: String,
     short: String,
     description: String,
@@ -20,7 +20,6 @@ const notificationSchema = new Schema(
     date: { date: String, time: String },
   },
   {
-    timestamps: true,
     collection: "notifications",
   }
 );
@@ -34,4 +33,4 @@ notificationSchema.pre("save", function (next) {
   next();
 });
 
-mongoose.model("penalty", notificationSchema);
+mongoose.model("notifications", notificationSchema);
